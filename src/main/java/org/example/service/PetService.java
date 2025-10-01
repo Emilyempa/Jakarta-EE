@@ -6,14 +6,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
+//import java.util.concurrent.locks.ReentrantLock;
 
 @ApplicationScoped
 public class PetService {
 
     private final ConcurrentHashMap<Long, PetDTO> pets = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
-    private final ReentrantLock lock = new ReentrantLock();
+//    private final ReentrantLock lock = new ReentrantLock();
 
     public PetService(){
         addPet(new PetDTO("Peggy", "Dog", 0, 5));
@@ -44,27 +44,15 @@ public class PetService {
     }
 
     public void feedPet(Long id) {
-        lock.lock();
-        try {
-            PetDTO pet = pets.get(id);
-            if (pet != null) {
-                pet.setHungerLevel(Math.max(0, pet.getHungerLevel() - 1));
-            }
-        } finally {
-            lock.unlock();
-        }
+        pets.computeIfPresent(id, (k, pet) ->
+                pet.withHungerLevel(Math.max(0, pet.getHungerLevel() - 1))
+        );
     }
 
     public void playWithPet(Long id) {
-        lock.lock();
-        try {
-            PetDTO pet = pets.get(id);
-            if (pet != null) {
-                pet.setHappiness(pet.getHappiness() + 1);
-            }
-        } finally {
-            lock.unlock();
-        }
+        pets.computeIfPresent(id, (k, pet) ->
+                pet.withHappiness(pet.getHappiness() + 1)
+        );
     }
 
     public void removePet(Long id) {
