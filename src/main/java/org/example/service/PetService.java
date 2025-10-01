@@ -6,14 +6,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.*;
-//import java.util.concurrent.locks.ReentrantLock;
 
 @ApplicationScoped
 public class PetService {
 
     private final ConcurrentHashMap<Long, PetDTO> pets = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
-//    private final ReentrantLock lock = new ReentrantLock();
 
     public PetService(){
         addPet(new PetDTO("Peggy", "Dog", 0, 5));
