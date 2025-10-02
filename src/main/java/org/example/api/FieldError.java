@@ -1,4 +1,3 @@
 package org.example.api;
 
-public record FieldError() {
-}
+public record FieldError(String field, String message) {}
