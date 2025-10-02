@@ -49,7 +49,7 @@ public class PetService {
 
     public void playWithPet(Long id) {
         pets.computeIfPresent(id, (k, pet) ->
-                pet.withHappiness(pet.happiness() + 1)
+                pet.withHappiness(Math.min(5, pet.happiness() + 1))
         );
     }
 
