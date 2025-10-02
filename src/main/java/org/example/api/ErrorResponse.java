@@ -6,7 +6,7 @@ public record ErrorResponse(
         int status,
         String error,
         long timestamp,
-        List<FieldError> filedErrors
+        List<FieldError> fieldErrors
 ) {
     public static ErrorResponse of(int status, String error, List<FieldError> fieldErrors) {
         return new ErrorResponse(status, error, System.currentTimeMillis(), fieldErrors);
