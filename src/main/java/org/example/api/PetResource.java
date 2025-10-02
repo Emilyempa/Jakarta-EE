@@ -45,33 +45,27 @@ public class PetResource {
     @PUT
     @Path("/{id}/feed")
     public Response feedPet(@PathParam("id") Long id) {
-        PetDTO pet = petService.getPetById(id);
-        if (pet == null) {
+        if (!petService.feedPet(id)) {
             throw new NotFoundException("Pet not found");
         }
-        petService.feedPet(id);
         return Response.noContent().build();
     }
 
     @PUT
     @Path("/{id}/play")
     public Response playWithPet(@PathParam("id") Long id) {
-        PetDTO pet = petService.getPetById(id);
-        if (pet == null) {
+        if (!petService.playWithPet(id)) {
             throw new NotFoundException("Pet not found");
         }
-        petService.playWithPet(id);
         return Response.noContent().build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response releasePet(@PathParam("id") Long id) {
-        PetDTO pet = petService.getPetById(id);
-        if (pet == null) {
+        if (!petService.removePet(id)) {
             throw new NotFoundException("Pet not found");
         }
-            petService.removePet(id);
         return Response.noContent().build();
     }
 }

@@ -41,19 +41,19 @@ public class PetService {
         return id;
     }
 
-    public void feedPet(Long id) {
-        pets.computeIfPresent(id, (k, pet) ->
+    public boolean feedPet(Long id) {
+        return pets.computeIfPresent(id, (k, pet) ->
                 pet.withHungerLevel(Math.max(0, pet.hungerLevel() - 1))
-        );
+        ) != null;
     }
 
-    public void playWithPet(Long id) {
-        pets.computeIfPresent(id, (k, pet) ->
+    public boolean playWithPet(Long id) {
+        return pets.computeIfPresent(id, (k, pet) ->
                 pet.withHappiness(Math.min(5, pet.happiness() + 1))
-        );
+        ) != null;
     }
 
-    public void removePet(Long id) {
-        pets.remove(id);
+    public boolean removePet(Long id) {
+        return pets.remove(id) != null;
     }
 }
