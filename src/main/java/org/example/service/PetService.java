@@ -43,13 +43,13 @@ public class PetService {
 
     public void feedPet(Long id) {
         pets.computeIfPresent(id, (k, pet) ->
-                pet.withHungerLevel(Math.max(0, pet.getHungerLevel() - 1))
+                pet.withHungerLevel(Math.max(0, pet.hungerLevel() - 1))
         );
     }
 
     public void playWithPet(Long id) {
         pets.computeIfPresent(id, (k, pet) ->
-                pet.withHappiness(pet.getHappiness() + 1)
+                pet.withHappiness(pet.happiness() + 1)
         );
     }
 
