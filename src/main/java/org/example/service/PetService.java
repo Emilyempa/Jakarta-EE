@@ -28,7 +28,7 @@ public class PetService {
     }
 
     public List<PetDTO> getAllPets() {
-        return new ArrayList<>(pets.values());
+        return List.copyOf(pets.values());
     }
 
     public PetDTO getPetById(Long id) {
