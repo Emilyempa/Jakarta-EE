@@ -43,43 +43,22 @@ public class PetService {
     public Long addPet(PetDTO pet) {
         Long id = idGenerator.getAndIncrement();
         pets.put(id, pet);
-        LOG.infof("Pet adopted: id=%d, name=%s, species=%s", id, pet.name(), pet.species());
         return id;
     }
 
     public boolean feedPet(Long id) {
-        boolean success = pets.computeIfPresent(id, (k, pet) ->
+        return pets.computeIfPresent(id, (k, pet) ->
                 pet.withHungerLevel(Math.max(0, pet.hungerLevel() - 1))
         ) != null;
-
-        if (success) {
-            LOG.debugf("Fed pet id=%d", id);
-        } else {
-            LOG.warnf("Attempted to feed non-existent pet id=%d", id);
-        }
-        return success;
     }
 
     public boolean playWithPet(Long id) {
-        boolean success = pets.computeIfPresent(id, (k, pet) ->
+        return pets.computeIfPresent(id, (k, pet) ->
                 pet.withHappiness(Math.min(5, pet.happiness() + 1))
         ) != null;
-
-        if (success) {
-            LOG.debugf("Played with pet id=%d", id);
-        } else {
-            LOG.warnf("Attempted to play with non-existent pet id=%d", id);
-        }
-        return success;
     }
 
     public boolean removePet(Long id) {
-        boolean success = pets.remove(id) != null;
-        if (success) {
-            LOG.infof("Pet released: id=%d", id);
-        } else {
-            LOG.warnf("Attempted to release non-existent pet id=%d", id);
-        }
-        return success;
+        return pets.remove(id) != null;
     }
 }
