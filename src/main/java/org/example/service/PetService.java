@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.PetDTO;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.jboss.logging.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,10 +11,13 @@ import java.util.*;
 @ApplicationScoped
 public class PetService {
 
+    private static final Logger LOG = Logger.getLogger(PetService.class);
+
     private final ConcurrentHashMap<Long, PetDTO> pets = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
 
     public PetService(){
+        LOG.info("Initializing PetService with sample pets");
         addPet(new PetDTO("Peggy", "Dog", 0, 5));
         addPet(new PetDTO("Bella", "Cat", 3, 3));
         addPet(new PetDTO("Ragnar", "Cat", 2, 2));
@@ -25,6 +29,7 @@ public class PetService {
         addPet(new PetDTO("Olly", "Dog", 2, 2));
         addPet(new PetDTO("Stubbur", "Dog", 1, 1));
         addPet(new PetDTO("Rosa", "Cat", 0, 5));
+        LOG.info("PetService initialized with " + pets.size() + " pets");
     }
 
     public List<PetDTO> getAllPets() {
@@ -38,22 +43,43 @@ public class PetService {
     public Long addPet(PetDTO pet) {
         Long id = idGenerator.getAndIncrement();
         pets.put(id, pet);
+        LOG.infof("Pet adopted: id=%d, name=%s, species=%s", id, pet.name(), pet.species());
         return id;
     }
 
     public boolean feedPet(Long id) {
-        return pets.computeIfPresent(id, (k, pet) ->
+        boolean success = pets.computeIfPresent(id, (k, pet) ->
                 pet.withHungerLevel(Math.max(0, pet.hungerLevel() - 1))
         ) != null;
+
+        if (success) {
+            LOG.debugf("Fed pet id=%d", id);
+        } else {
+            LOG.warnf("Attempted to feed non-existent pet id=%d", id);
+        }
+        return success;
     }
 
     public boolean playWithPet(Long id) {
-        return pets.computeIfPresent(id, (k, pet) ->
+        boolean success = pets.computeIfPresent(id, (k, pet) ->
                 pet.withHappiness(Math.min(5, pet.happiness() + 1))
         ) != null;
+
+        if (success) {
+            LOG.debugf("Played with pet id=%d", id);
+        } else {
+            LOG.warnf("Attempted to play with non-existent pet id=%d", id);
+        }
+        return success;
     }
 
     public boolean removePet(Long id) {
-        return pets.remove(id) != null;
+        boolean success = pets.remove(id) != null;
+        if (success) {
+            LOG.infof("Pet released: id=%d", id);
+        } else {
+            LOG.warnf("Attempted to release non-existent pet id=%d", id);
+        }
+        return success;
     }
 }
