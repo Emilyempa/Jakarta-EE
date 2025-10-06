@@ -112,4 +112,17 @@ public class PetService {
 
         return List.copyOf(pets.subList(fromIndex, toIndex));
     }
+
+    public int getTotalCount() {
+        return pets.size();
+    }
+
+    public int getFilteredCount(String species) {
+        if (species == null || species.isBlank()) {
+            return pets.size();
+        }
+        return (int) pets.values().stream()
+                .filter(p -> p.species().equalsIgnoreCase(species))
+                .count();
+    }
 }

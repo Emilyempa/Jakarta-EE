@@ -61,7 +61,10 @@ public class PetResource {
         LOG.infof("Fetching pets with sortBy=%s, order=%s, offset=%d, limit=%d", sortBy, order, offset, limit);
 
         List<PetDTO> pets = petService.getPetsFiltered(species, sortBy, order, offset, limit);
-        int total = petService.getAllPets().size();
+
+        int total = (species == null || species.isBlank())
+                ? petService.getTotalCount()
+                : petService.getFilteredCount(species);
 
         return Response.ok(pets)
                 .header("X-Total-Count", total)
