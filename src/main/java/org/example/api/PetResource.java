@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PetResource {
+
+    private static final Logger LOG = Logger.getLogger(PetResource.class);
 
     @Inject
     PetService petService;
@@ -28,8 +31,42 @@ public class PetResource {
     }
 
     @GET
-    public List<PetDTO> getAllPets() {
-        return petService.getAllPets();
+    public Response getAllPets(
+            @QueryParam("species") String species,
+            @QueryParam("sortBy") @DefaultValue("name") String sortBy,
+            @QueryParam("order") @DefaultValue("asc") String order,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("10") int limit
+    ) {
+        if (offset < 0) {
+            throw new BadRequestException("Offset must be >= 0");
+        }
+
+        if (limit < 0) {
+            throw new BadRequestException("Limit must be >= 0 (0 means no limit)");
+        }
+
+        List<String> allowedSortFields = List.of("name", "species", "hungerLevel", "happiness");
+        boolean isValidSort = allowedSortFields.stream()
+                .anyMatch(field -> field.equalsIgnoreCase(sortBy));
+
+        if (!isValidSort) {
+            throw new BadRequestException("Invalid sortBy. Allowed values: name, species, hungerLevel, happiness");
+        }
+
+        if (!(order.equalsIgnoreCase("asc") || order.equalsIgnoreCase("desc"))) {
+            throw new BadRequestException("Invalid order. Allowed values: asc, desc");
+        }
+
+        LOG.infof("Fetching pets with sortBy=%s, order=%s, offset=%d, limit=%d", sortBy, order, offset, limit);
+
+        List<PetDTO> pets = petService.getPetsFiltered(species, sortBy, order, offset, limit);
+        int total = petService.getAllPets().size();
+
+        return Response.ok(pets)
+                .header("X-Total-Count", total)
+                .build();
+
     }
 
     @GET
