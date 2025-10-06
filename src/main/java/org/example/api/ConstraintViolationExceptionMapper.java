@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.jboss.logging.Logger;
 
 
 import java.util.List;
@@ -13,8 +14,12 @@ import java.util.stream.Collectors;
 @Provider
 public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
+    private static final Logger LOG = Logger.getLogger(ConstraintViolationExceptionMapper.class);
+
     @Override
     public Response toResponse(ConstraintViolationException exception) {
+        LOG.warnf("Validation failed: %s", exception.getMessage());
+
         List<FieldError> fieldErrors = exception.getConstraintViolations()
                 .stream()
                 .map(violation -> {
