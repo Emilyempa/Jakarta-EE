@@ -68,6 +68,8 @@ public class PetResource {
 
         return Response.ok(pets)
                 .header("X-Total-Count", total)
+                .header("X-Offset", offset)
+                .header("X-Limit", limit)
                 .build();
 
     }
