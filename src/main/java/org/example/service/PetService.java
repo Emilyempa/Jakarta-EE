@@ -61,4 +61,55 @@ public class PetService {
     public boolean removePet(Long id) {
         return pets.remove(id) != null;
     }
+
+    public List<PetDTO> getPetsFiltered(String species, String sortBy, String order, int offset, int limit) {
+        List<PetDTO> result = new ArrayList<>(pets.values());
+
+        result = filterBySpecies(result, species);
+        result = sortPets(result, sortBy, order);
+        return paginate(result, offset, limit);
+    }
+
+    // Filter
+    private List<PetDTO> filterBySpecies(List<PetDTO> pets, String species) {
+        if (species == null || species.isBlank()) {
+            return List.copyOf(pets);
+        }
+
+        return List.copyOf(
+                pets.stream()
+                        .filter(p -> p.species().equalsIgnoreCase(species))
+                        .toList()
+        );
+    }
+
+    // Sort
+    private List<PetDTO> sortPets(List<PetDTO> pets, String sortBy, String order) {
+        Comparator<PetDTO> comparator = switch (sortBy.toLowerCase()) {
+            case "happiness" -> Comparator.comparingInt(PetDTO::happiness);
+            case "hungerlevel" -> Comparator.comparingInt(PetDTO::hungerLevel);
+            case "species" -> Comparator.comparing(PetDTO::species, String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(PetDTO::name, String.CASE_INSENSITIVE_ORDER);
+        };
+
+        if ("desc".equalsIgnoreCase(order)) {
+            comparator = comparator.reversed();
+        }
+
+        return pets.stream()
+                .sorted(comparator)
+                .toList();
+    }
+
+    // Pagination
+    private List<PetDTO> paginate(List<PetDTO> pets, int offset, int limit) {
+        int fromIndex = Math.max(0, offset);
+        int toIndex = Math.min(pets.size(), fromIndex + limit);
+
+        if (fromIndex >= pets.size()) {
+            return List.of();
+        }
+
+        return List.copyOf(pets.subList(fromIndex, toIndex));
+    }
 }
