@@ -76,15 +76,16 @@ public class PetService {
             return List.copyOf(pets);
         }
 
-        return List.copyOf(
-                pets.stream()
-                        .filter(p -> p.species().equalsIgnoreCase(species))
-                        .toList()
-        );
+        return pets.stream()
+                .filter(p -> p.species().equalsIgnoreCase(species))
+                .toList();
     }
 
     // Sort
     private List<PetDTO> sortPets(List<PetDTO> pets, String sortBy, String order) {
+        if (sortBy == null || sortBy.isBlank()) {
+            sortBy = "name";
+        }
         Comparator<PetDTO> comparator = switch (sortBy.toLowerCase()) {
             case "happiness" -> Comparator.comparingInt(PetDTO::happiness);
             case "hungerlevel" -> Comparator.comparingInt(PetDTO::hungerLevel);

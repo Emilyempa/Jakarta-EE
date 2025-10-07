@@ -12,10 +12,12 @@ public record PetDTO(
 
     // Builders
     public PetDTO withHungerLevel(int newLevel) {
-        return new PetDTO(name, species, newLevel, happiness);
+        int boundedLevel = Math.max(0, Math.min(5, newLevel));
+        return new PetDTO(name, species, boundedLevel, happiness);
     }
 
     public PetDTO withHappiness(int newHappiness) {
-        return new PetDTO(name, species, hungerLevel, newHappiness);
+        int boundedHappiness = Math.max(0, Math.min(5, newHappiness));
+        return new PetDTO(name, species, hungerLevel, boundedHappiness);
     }
 }
