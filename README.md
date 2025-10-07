@@ -44,8 +44,8 @@ Then access the API at:
 ## Data model
 
 PetDTO
-- name: string (required)
-- species: string (required)
+- name: string (required, not blank)
+- species: string (required, not blank)
 - hungerLevel: integer 0..5 (required)
 - happiness: integer 0..5 (required)
 
@@ -108,6 +108,14 @@ All endpoints produce and consume application/json unless otherwise stated.
   Release a pet (remove).
   Responses: 204 No Content or 404 Not Found
 
+## Error Handling
+
+The API uses custom exception mappers (@Provider) for consistent error responses:
+- ConstraintViolationExceptionMapper - Bean Validation errors (400)
+- NotFoundExceptionMapper - Resource not found (404)
+- BadRequestExceptionMapper - Invalid query parameters (400)
+
+All errors return JSON with fieldErrors array when applicable.
 
 ## Filtering, sorting, and pagination in detail
 
@@ -131,9 +139,9 @@ Combined examples:
 ## Example curl commands
 
 Create a pet:
-- curl -i -X POST "http://localhost:8080/api/pets" ^
-  -H "Content-Type: application/json" ^
-  -d "{\"name\":\"Luna\",\"species\":\"Dog\",\"hungerLevel\":2,\"happiness\":4}"
+- curl -i -X POST "http://localhost:8080/api/pets" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Luna","species":"Dog","hungerLevel":2,"happiness":4}'
 
 List pets (first page):
 - curl -i "http://localhost:8080/api/pets?offset=0&limit=10"
@@ -168,11 +176,4 @@ Common cases:
 - 400 Bad Request: invalid query parameters or validation failures
 - 404 Not Found: when a pet id is not found
 
-
-## Project details
-
-- Stack: Jakarta EE 10 (REST/JAX-RS, Validation), WildFly 35, Java 21, Maven
-- Default WildFly HTTP port: 8080
-- Context path (WAR): /jakartaee-hello-world
-- REST base path: /api
 

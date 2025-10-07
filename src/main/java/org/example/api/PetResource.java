@@ -71,7 +71,6 @@ public class PetResource {
                 .header("X-Offset", offset)
                 .header("X-Limit", limit)
                 .build();
-
     }
 
     @GET
